@@ -21,79 +21,52 @@ public class Myservice extends Service {
     private boolean isPlaying;
 
     public boolean isPlaying() {
-        return isPlaying;
+        return mediaPlayer.isPlaying();
     }
 
     public MediaPlayer getMediaPlayer() {
         return mediaPlayer;
     }
 
+
     @Override
     public void onCreate() {
-        Log.e("Music", "MyService onCreate");
+        mediaPlayer = MediaPlayer.create(this, R.raw.haiphuthon);
         super.onCreate();
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        Log.e("Music", "MyService onBind");
+        mediaPlayer.start();
         return myBinder;
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e("Music", "MyService onStartCommand");
-        Bundle bundle = intent.getExtras();
-
-        if (bundle != null) {
-            Song song = (Song) bundle.get("object_song");
-
-            startMusic(song);
-        }
-
-        return START_NOT_STICKY;
+    public void fastforward(){
+        mediaPlayer.seekTo(10000 + mediaPlayer.getCurrentPosition());
     }
-
-    private void startMusic(Song song) {
-        if (mediaPlayer == null) {
-            mediaPlayer = MediaPlayer.create(getApplicationContext(), song.getResouce());
-
-        }
-        mediaPlayer.start();
-        isPlaying = true;
-    }
-
-    public void pauseMusic() {
-        if (mediaPlayer != null && isPlaying) {
-            mediaPlayer.pause();
-            isPlaying = false;
-        }
-    }
-
-    public void resumeMusic() {
-        if (mediaPlayer != null && !isPlaying) {
-            mediaPlayer.start();
-            isPlaying = true;
-        }
+    public void backforward(){
+        mediaPlayer.seekTo(-10000 + mediaPlayer.getCurrentPosition());
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.e("Music", "MyService onUnbind");
+        mediaPlayer.stop();
         return super.onUnbind(intent);
     }
 
     @Override
     public void onDestroy() {
-        Log.e("Music", "MyService onDestroy");
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-        super.onDestroy();
+        mediaPlayer.reset();
     }
 
+    public void playMusic(){
+        mediaPlayer.start();
+    }
+
+    public void pauseMusic(){
+        mediaPlayer.pause();
+    }
 
     public class MyBinder extends Binder {
         Myservice getMyService() {

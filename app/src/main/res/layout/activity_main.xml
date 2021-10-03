@@ -16,10 +16,10 @@
         android:text="00:00"
         android:textSize="20dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/imgStop" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imgStop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
@@ -101,7 +101,7 @@
         app:srcCompat="@drawable/replay" />
 
     <ImageView
-        android:id="@+id/imageView9"
+        android:id="@+id/imgback"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
@@ -111,7 +111,7 @@
         app:srcCompat="@drawable/back" />
 
     <ImageView
-        android:id="@+id/imageView10"
+        android:id="@+id/imgnext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="40dp"
@@ -126,8 +126,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="40dp"
         app:layout_constraintBottom_toTopOf="@+id/imageView3"
-        app:layout_constraintEnd_toStartOf="@+id/imageView10"
-        app:layout_constraintStart_toEndOf="@+id/imageView9"
+        app:layout_constraintEnd_toStartOf="@+id/imgnext"
+        app:layout_constraintStart_toEndOf="@+id/imgback"
         app:srcCompat="@drawable/play" />
 
     <ImageView
@@ -136,7 +136,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="90dp"
         android:layout_marginBottom="60dp"
-        app:layout_constraintBottom_toTopOf="@+id/imageView9"
+        app:layout_constraintBottom_toTopOf="@+id/imgback"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/like" />
 
@@ -173,7 +173,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="88dp"
-        android:text="Cưới Thôi - Masew, Masiu, B Ray, V.A"
+        android:text="2 Phút Hơn (KAIZ Remix) - Pháo"
         android:textSize="20dp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -189,7 +189,7 @@
         android:text="00:00"
         android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/imgStop" />
 
     <SeekBar
         android:id="@+id/sk_bar"
@@ -209,22 +209,24 @@
         android:textAlignment="center"
         android:textColor="#3949AB"
         android:textSize="25dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btn_start"
-        android:layout_width="208dp"
-        android:layout_height="49dp"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/button_service"
-        android:text="Start Service"
+    <TextView
+        android:id="@+id/tv_title2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="Tạm dừng"
         android:textAlignment="center"
-        android:textColor="#FAFFFA"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:textColor="#3949AB"
+        android:textSize="25dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

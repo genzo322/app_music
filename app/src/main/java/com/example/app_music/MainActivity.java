@@ -17,19 +17,18 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 
 public class MainActivity extends AppCompatActivity {
 
     private boolean isServiceConnected;
-    ImageView imgplay, imgcd;
-    Button bt_start;
+    ImageView imgplay, imgcd, imgstop, imgback, imgnext;
     SeekBar sk_song;
-    TextView tv_timestart, tv_timeout, tv_title;
+    TextView tv_timestart, tv_timeout, tv_title, tv_title2;
     private Myservice myservice;
     Animation animation;
-
 
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
@@ -38,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
             Myservice.MyBinder myBinder = (Myservice.MyBinder) iBinder;
             myservice = myBinder.getMyService();
             isServiceConnected = true;
-            TimeOut();
             Time();
+            TimeOut();
         }
 
         @Override
@@ -54,24 +53,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        tv_title2 = findViewById(R.id.tv_title2);
         tv_title = findViewById(R.id.tv_title);
         sk_song = findViewById(R.id.sk_bar);
         tv_timestart = findViewById(R.id.tv_timstart);
         tv_timeout = findViewById(R.id.tv_timeout);
         imgcd = findViewById(R.id.imgcd);
         imgplay = findViewById(R.id.imgplay);
-        bt_start = findViewById(R.id.btn_start);
+        imgstop = findViewById(R.id.imgStop);
+        imgback = findViewById(R.id.imgback);
+        imgnext = findViewById(R.id.imgnext);
 
         animation = AnimationUtils.loadAnimation(this, R.anim.disc_rotate);
 
-        bt_start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickStartService();
-                imgcd.startAnimation(animation);
-
-            }
-        });
 
         sk_song.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -90,46 +84,85 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        imgnext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isServiceConnected)
+                    myservice.fastforward();
+                else{
+                    Toast.makeText(MainActivity.this, "Service chưa hoạt động", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        imgback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isServiceConnected)
+                    myservice.backforward();
+                else{
+                    Toast.makeText(MainActivity.this, "Service chưa hoạt động", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        });
+
+        imgstop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickStopService();
+            }
+        });
+
+        final Intent intent = new Intent(MainActivity.this, Myservice.class);
 
         imgplay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (myservice.isPlaying()){
-                    myservice.pauseMusic();
-                    imgplay.setImageResource(R.drawable.play);
-                    imgcd.clearAnimation();
-                }
-                else{
-                    myservice.resumeMusic();
+                if(isServiceConnected){
+                    if (myservice.isPlaying()) {
+                        myservice.pauseMusic();
+                        imgplay.setImageResource(R.drawable.play);
+                        imgcd.clearAnimation();
+                        tv_title.setVisibility(View.GONE);
+                        tv_title2.setVisibility(View.VISIBLE);
+                    } else {
+                        myservice.playMusic();
+                        imgplay.setImageResource(R.drawable.ic_pause);
+                        imgcd.startAnimation(animation);
+                        tv_title2.setVisibility(View.GONE);
+                        tv_title.setVisibility(View.VISIBLE);
+                    }
+                    Time();
+                    TimeOut();
+                }else {
+                    bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
                     imgplay.setImageResource(R.drawable.ic_pause);
                     imgcd.startAnimation(animation);
+                    tv_title2.setVisibility(View.GONE);
+                    tv_title.setVisibility(View.VISIBLE);
                 }
-                Time();
-                TimeOut();
             }
+
         });
     }
-    private void onClickStartService() {
-        Intent intent = new Intent(this, Myservice.class);
-        Song song = new Song("Cricus - Remix", R.raw.cuoithoi);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("object_song", song);
-        intent.putExtras(bundle);
-        startService(intent);
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-        imgplay.setImageResource(R.drawable.ic_pause);
-        imgplay.setVisibility(View.VISIBLE);
-        tv_title.setVisibility(View.VISIBLE);
-        bt_start.setVisibility(View.GONE);
+
+    private void onClickStopService() {
+       if (myservice.isPlaying()){
+           unbindService(serviceConnection);
+           isServiceConnected = false;
+           imgplay.setImageResource(R.drawable.play);
+           imgcd.clearAnimation();
+           tv_title2.setVisibility(View.GONE);
+           tv_title.setVisibility(View.GONE);
+       }else{
+           unbindService(serviceConnection);
+           isServiceConnected = false;
+       }
+
     }
 
-    private void TimeOut(){
-        SimpleDateFormat format = new SimpleDateFormat("mm:ss");
-        tv_timeout.setText(format.format(myservice.getMediaPlayer().getDuration()));
-        sk_song.setMax(myservice.getMediaPlayer().getDuration());
-    }
-
-    private void Time(){
+    private void Time() {
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -142,8 +175,6 @@ public class MainActivity extends AppCompatActivity {
                     public void onCompletion(MediaPlayer mp) {
                         imgcd.clearAnimation();
                         imgplay.setImageResource(R.drawable.play);
-                        bt_start.setVisibility(View.VISIBLE);
-                        tv_title.setVisibility(View.GONE);
                         Time();
                         TimeOut();
                     }
@@ -152,5 +183,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 100);
     }
+
+    private void TimeOut() {
+        SimpleDateFormat format = new SimpleDateFormat("mm:ss");
+        tv_timeout.setText(format.format(myservice.getMediaPlayer().getDuration()));
+        sk_song.setMax(myservice.getMediaPlayer().getDuration());
+    }
+
 
 }
